@@ -4,10 +4,13 @@ const path = require('path');
 HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/js/index.js', // точка входа
+    entry: {
+        main: './src/js/index.js', // чанк main
+        analitics: './src/js/analitics.js' // чанкт аналитики 
+    } ,
     // Описание бандла (-лов):
     output: { 
-        filename: 'bundle.js', // имя
+        filename: '[name].bundle.[hash].js', // имя
         path: path.resolve(__dirname, 'dist'), // куда положить
         clean: true, // очистить перед новой сборкой
     },
@@ -25,7 +28,7 @@ module.exports = {
         ]
     },
     devServer: {
-        port: 3000
+        port: 8888
     },
     optimization: {
         minimize: false,
