@@ -7,7 +7,7 @@ const CopyPlugin = require("copy-webpack-plugin"); // Для перемещен�
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // генерирует отдельные css файлы
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); // оптимизация и минификация CSS
 const TerserPlugin = require("terser-webpack-plugin"); // минификация js
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // для работы по оптимизации
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // для работы по оптимизации
 
 // определение переменных окружения для разных настроек сборки
 const isDev = process.env.NODE_ENV === "development";
@@ -29,11 +29,11 @@ const optimization = () => {
 };
 
 module.exports = {
-  context: path.resolve(__dirname, "./"), // относительно какой папки берутся все пути в сборке
+  context: path.resolve(__dirname, "./src"), // относительно какой папки берутся все пути в сборке
   entry: "./js/index.js", // входная точка
   output: {
     filename: "bundle.js", // имя выхода
-    path: path.resolve(__dirname, "../static/dist"), // место выхода
+    path: path.resolve(__dirname, "dist"), // место выхода
     // clean: true, // очистить перед новой сборкой (как альтернатива плагину clean-webpack-plugin)
   },
   optimization: optimization(), // конциг оптимизации (минификации) файлов
@@ -44,7 +44,8 @@ module.exports = {
       "@jsPagesPath": path.resolve(__dirname, "js/pages"),
     },
   },
-  devtool: isDev ? "source-map" : "", // Добавить sourcemap к js и css в режиме разработки
+  devtool: isDev ? "source-map" : false, // Добавить sourcemap к js и css в режиме разработки
+  
   devServer: { // Когда проект без бекенда, как альтернатива Browser Sync
     port: 8000,
   },
@@ -61,7 +62,19 @@ module.exports = {
         },
       },
       {
-        test: /\.s[ac]ss$/i, // Обработка css
+        test: /\.css$/i, // Обработка только css
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader, // генерирует css в отдельный файл
+            options: {
+              // ... // возможны доп. настройки
+            },
+          },
+          "css-loader", // чтобы был возможен импорт css в js
+        ],
+      },
+      {
+        test: /\.s[ac]ss$/i, // Обработка sass и scss
         use: [
           {
             loader: MiniCssExtractPlugin.loader, // генерирует css в отдельный файл
@@ -97,6 +110,6 @@ module.exports = {
       template: "./html/index.html", // какой шаблон html генерировать в dist
       inject: "body", // куда добавлять скрипты true || 'head' || 'body' || false
     }),
-    // new BundleAnalyzerPlugin()
+    new BundleAnalyzerPlugin()
   ],
 };

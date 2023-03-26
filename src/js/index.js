@@ -1,4 +1,4 @@
-import { toggleClass } from './module';
+import { toggleClass } from './module.js';
 import '../css/main.css';
 
 toggleClass('.elem', 'active');
