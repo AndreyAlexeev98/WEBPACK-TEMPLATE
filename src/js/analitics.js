@@ -1,8 +1,9 @@
 // Пример староннего скрипта (по сути не относящегося на прямую к логике остальных модулей)
 
-let counter = 0;
-
-document.addEventListener('click', () => {
-    counter++ ;
-    console.log(counter);
-});
+export function analitic() {
+  async function f() {
+    return 1;
+  }
+  
+  f().then(alert); 
+};

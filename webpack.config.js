@@ -6,8 +6,8 @@ const BrowserSyncPlugin = require("browser-sync-webpack-plugin"); // для ра
 const CopyPlugin = require("copy-webpack-plugin"); // Для перемещения файлов
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // генерирует отдельные css файлы
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); // оптимизация и минификация CSS
-const TerserPlugin = require("terser-webpack-plugin"); // минификация js
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // для работы по оптимизации
+const TerserPlugin = require("terser-webpack-plugin"); // минификация js файлов
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // для работы по оптимизации
 
 // определение переменных окружения для разных настроек сборки
 const isDev = process.env.NODE_ENV === "development";
@@ -31,8 +31,15 @@ const optimization = () => {
 module.exports = {
   context: path.resolve(__dirname, "./src"), // относительно какой папки берутся все пути в сборке
   entry: "./js/index.js", // входная точка
+  /*
+  // Можно разделить бандлы JS и CSS
+  entry: {
+    js: ['./js/index.js'],
+    style: ['./src/style/main.scss'],
+  }
+  */
   output: {
-    filename: "bundle.js", // имя выхода
+    filename: "bundle.[hash].js", // имя выхода js
     path: path.resolve(__dirname, "dist"), // место выхода
     // clean: true, // очистить перед новой сборкой (как альтернатива плагину clean-webpack-plugin)
   },
@@ -83,12 +90,31 @@ module.exports = {
             },
           },
           "css-loader", // чтобы был возможен импорт css в js
+          { 
+            loader: "postcss-loader", // Использование postcss
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require('autoprefixer'), // Для генерации префиксов к css
+                ],
+              },
+            },
+          },
           "sass-loader", // компиляция sass в css
         ],
       },
       {
         test: /\.(png|jpe?g|svg|webp|gif|ico)$/i, // Для использования файлов данных форматов в js
         use: ["file-loader"],
+      },
+      {
+        test: /\.twig$/,
+        use: {
+          loader: 'twig-loader',
+          options: {
+            autoescape: true,
+          },
+        }
       },
     ],
   },
@@ -104,12 +130,12 @@ module.exports = {
       patterns: [{ from: "./icons/**.*", to: "./" }],
     }),
     new MiniCssExtractPlugin({
-      filename: "[name].css", // паттерн [name] полезен когда в js импортим несколько css файлов
+      filename: "[name].[hash].css", // имя для выходного css файла. Паттерн [name] полезен когда в js импортим несколько css файлов
     }),
     new HtmlWebpackPlugin({
       template: "./html/index.html", // какой шаблон html генерировать в dist
       inject: "body", // куда добавлять скрипты true || 'head' || 'body' || false
     }),
-    new BundleAnalyzerPlugin()
+    // new BundleAnalyzerPlugin()
   ],
 };
