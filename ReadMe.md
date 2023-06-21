@@ -1,6 +1,7 @@
 # Осталось:
 
 * Svg sprite generator
+* svgo - оптимизатор svg файлов - svgo-loader
 * Подключить шрифты
 * Подключить json, csv, xml файлы
 * Подключить js и css библиотеки
